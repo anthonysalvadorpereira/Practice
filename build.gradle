@@ -1,0 +1,25 @@
+plugins {
+    id 'java'
+    id 'idea'
+}
+
+group 'com.anthony.programming.tests'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.9
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
+
+    testImplementation('org.junit.jupiter:junit-jupiter:5.5.2')
+    testImplementation group: 'org.hamcrest', name: 'hamcrest', version: '2.2'
+
+}
+
+test {
+    useJUnitPlatform()
+}
