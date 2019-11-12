@@ -1,7 +1,4 @@
-package com.anthony.programming.tests.one;
-
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
+package com.anthony.programming.challenge.one;
 
 import java.util.Objects;
 

@@ -1,4 +1,4 @@
-package com.anthony.programming.tests.one;
+package com.anthony.programming.challenge.one;
 
 import java.util.Arrays;
 import java.util.List;

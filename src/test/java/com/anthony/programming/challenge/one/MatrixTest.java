@@ -1,5 +1,6 @@
-package com.anthony.programming.tests.one;
+package com.anthony.programming.challenge.one;
 
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -129,12 +130,12 @@ class MatrixTest {
 
     @Test
     public void shouldFetchNextPositionGivenAValidPosition() {
-        assertThat(matrix.nextPosition(new Position(0,0)), is(new Position(0,1)));
+        assertThat(matrix.nextPosition(new Position(0,0)), Matchers.is(new Position(0,1)));
     }
 
     @Test
     public void shouldFetchNextRowPositionGivenEndOfRow() {
-        assertThat(matrix.nextPosition(new Position(0,3)), is(new Position(1,0)));
+        assertThat(matrix.nextPosition(new Position(0,3)), Matchers.is(new Position(1,0)));
     }
 
     @Test
