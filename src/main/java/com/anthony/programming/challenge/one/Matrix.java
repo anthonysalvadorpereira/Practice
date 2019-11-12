@@ -8,11 +8,11 @@ import java.util.Objects;
 public class Matrix {
 
     private char[][] dataMatrix;
-    private int rows;
-    private int cols;
+    private int rowLength;
+    private int columnLength;
 
     /**
-     * Construct Matrix by specifying rows, columns and passing data
+     * Construct Matrix by specifying rowLength, columns and passing data
      * @param num_rows
      * @param num_cols
      * @param data
@@ -23,8 +23,8 @@ public class Matrix {
             throw new IllegalArgumentException("Invalid array config");
         }
 
-        this.rows = num_rows;
-        this.cols = num_cols;
+        this.rowLength = num_rows;
+        this.columnLength = num_cols;
         this.dataMatrix = new char[num_rows][num_cols];
 
         ListIterator<Character> iterator = data.listIterator();
@@ -44,8 +44,8 @@ public class Matrix {
      */
     boolean isValidPosition(Position position) {
         boolean result = true;
-        if (Objects.isNull(position) || position.getRow() > (rows-1) ||
-                position.getColumn() > (cols-1) || position.getRow() < 0 || position.getColumn() < 0) {
+        if (Objects.isNull(position) || position.getRowIndex() > (rowLength -1) ||
+                position.getColumnIndex() > (columnLength -1) || position.getRowIndex() < 0 || position.getColumnIndex() < 0) {
             result = false;
         }
         return result;
@@ -64,9 +64,9 @@ public class Matrix {
         }
 
         Position charPosition = null;
-        for (int j = position.getColumn(); j < cols; j++) {
-                if(this.dataMatrix[position.getRow()][j] == searchChar) {
-                    charPosition = new Position(position.getRow(),j);
+        for (int j = position.getColumnIndex(); j < columnLength; j++) {
+                if(this.dataMatrix[position.getRowIndex()][j] == searchChar) {
+                    charPosition = new Position(position.getRowIndex(),j);
                     break;
                 }
         }
@@ -86,12 +86,12 @@ public class Matrix {
         if(!isValidPosition(position)) {
             throw new IllegalArgumentException("Invalid Position");
         }
-        int targetLength = length < cols - position.getColumn() ? length : cols - position.getColumn();
+        int targetLength = length < columnLength - position.getColumnIndex() ? length : columnLength - position.getColumnIndex();
         char[] subSet = new char[targetLength];
-        int currentIndex = position.getColumn();
+        int currentIndex = position.getColumnIndex();
         int i = 0;
-        while (currentIndex < cols && i < length) {
-            subSet[i] = dataMatrix[position.getRow()][currentIndex];
+        while (currentIndex < columnLength && i < length) {
+            subSet[i] = dataMatrix[position.getRowIndex()][currentIndex];
             i++;
             currentIndex++;
         }
@@ -110,12 +110,12 @@ public class Matrix {
         if(!isValidPosition(position)) {
             throw new IllegalArgumentException("Invalid Position");
         }
-        int targetLength = length < rows - position.getRow() ? length : rows - position.getRow();
+        int targetLength = length < rowLength - position.getRowIndex() ? length : rowLength - position.getRowIndex();
         char[] subSet = new char[targetLength];
-        int currentIndex = position.getRow();
+        int currentIndex = position.getRowIndex();
         int i = 0;
-        while (currentIndex < rows && i < length) {
-            subSet[i] = dataMatrix[currentIndex][position.getColumn()];
+        while (currentIndex < rowLength && i < length) {
+            subSet[i] = dataMatrix[currentIndex][position.getColumnIndex()];
             i++;
             currentIndex++;
         }
@@ -134,7 +134,7 @@ public class Matrix {
         }
 
         boolean result = true;
-        if (position.getColumn() == (cols - 1) && position.getRow() == (rows - 1)) {
+        if (position.getColumnIndex() == (columnLength - 1) && position.getRowIndex() == (rowLength - 1)) {
             result = false;
         }
         return result;
@@ -155,10 +155,10 @@ public class Matrix {
 
         Position next;
 
-        if(position.getColumn() < (cols-1)) {
-            next = new Position(position.getRow(), position.getColumn()+1);
-        } else if( position.getRow() < (rows - 1)) {
-            next = new Position(position.getRow() + 1, 0);
+        if(position.getColumnIndex() < (columnLength -1)) {
+            next = new Position(position.getRowIndex(), position.getColumnIndex()+1);
+        } else if( position.getRowIndex() < (rowLength - 1)) {
+            next = new Position(position.getRowIndex() + 1, 0);
         } else {
             throw new IllegalArgumentException("Matrix Ended");
         }
@@ -189,10 +189,12 @@ public class Matrix {
         }
         boolean found = false;
 
-        //TODO: Check if remaining length less than sequence length and skip row/column
-
-        if(compare(target, horizontalTraversal(position, target.length)) ||
-                compare(target, verticalTraversal(position, target.length)) ) {
+        int sequenceLength = target.length;
+        // If remaining characters is less than target vertically or horizontally, then skip checks
+        if ((((position.getColumnIndex() + sequenceLength) <= columnLength) &&
+                compare(target, horizontalTraversal(position, target.length))) ||
+        (((position.getRowIndex() + sequenceLength) <= rowLength) &&
+                compare(target, verticalTraversal(position, target.length)))) {
             found = true;
         }
         return found;
@@ -218,14 +220,12 @@ public class Matrix {
      */
     boolean findSequenceFromPosition(char[] sequence, Position startPosition, boolean isFound) {
         boolean result = isFound;
-
-        //TODO: Check if remaining length less than sequence length and skip row
         Position next = this.findNextInRowFromPosition(sequence[0], startPosition);
 
         if(!Objects.isNull(next) && isTargetSequence(sequence, next)) {
             result = true;
-        } else if(!result && Objects.isNull(next) && hasNext(new Position(startPosition.getRow(), (cols-1)))) {
-            result = findSequenceFromPosition(sequence, nextPosition(new Position(startPosition.getRow(), (cols-1))), result);
+        } else if(!result && Objects.isNull(next) && hasNext(new Position(startPosition.getRowIndex(), (columnLength -1)))) {
+            result = findSequenceFromPosition(sequence, nextPosition(new Position(startPosition.getRowIndex(), (columnLength -1))), result);
         } else if(!result && !Objects.isNull(next) && hasNext(next)) {
             result = findSequenceFromPosition(sequence, nextPosition(next), result);
         }

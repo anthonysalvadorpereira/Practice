@@ -4,20 +4,20 @@ import java.util.Objects;
 
 public class Position {
 
-    private final int row;
-    private final int column;
+    private final int rowIndex;
+    private final int columnIndex;
 
-    public Position(final int row, final int column) {
-        this.row = row;
-        this.column = column;
+    public Position(final int rowIndex, final int columnIndex) {
+        this.rowIndex = rowIndex;
+        this.columnIndex = columnIndex;
     }
 
-    public int getRow() {
-        return row;
+    public int getRowIndex() {
+        return rowIndex;
     }
 
-    public int getColumn() {
-        return column;
+    public int getColumnIndex() {
+        return columnIndex;
     }
 
     @Override
@@ -25,20 +25,20 @@ public class Position {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Position position = (Position) o;
-        return row == position.row &&
-                column == position.column;
+        return rowIndex == position.rowIndex &&
+                columnIndex == position.columnIndex;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(row, column);
+        return Objects.hash(rowIndex, columnIndex);
     }
 
     @Override
     public String toString() {
         return "Position{" +
-                "row=" + row +
-                ", column=" + column +
+                "rowIndex=" + rowIndex +
+                ", columnIndex=" + columnIndex +
                 '}';
     }
 }
