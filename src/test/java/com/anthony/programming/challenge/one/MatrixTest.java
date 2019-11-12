@@ -6,10 +6,13 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 
 class MatrixTest {
 
@@ -26,6 +29,55 @@ class MatrixTest {
     @AfterEach
     void tearDown() {
         matrix = null;
+    }
+
+    @Test
+    public void shouldThrowExceptionOnInvalidDataToMatrixConstructor() {
+        Assertions.assertThrows(IllegalArgumentException.class,()->new Matrix(-1,0,new ArrayList<>()));
+        Assertions.assertThrows(IllegalArgumentException.class,()->new Matrix(1,-1,new ArrayList<>()));
+        Assertions.assertThrows(IllegalArgumentException.class,()->new Matrix(0,0,new ArrayList<>()));
+        Assertions.assertThrows(IllegalArgumentException.class,()->new Matrix(1,1,new ArrayList<>()));
+        Assertions.assertThrows(IllegalArgumentException.class,()->new Matrix(2,1,Arrays.asList('A','B', 'B')));
+    }
+
+    @Test
+    public void shouldBuildMatrixOnValidData() {
+        assertThat(matrix, notNullValue());
+    }
+
+    @Test
+    public void shouldReturnFalseIfPositionIsInvalid() {
+        assertThat(matrix.isValidPosition(new Position(0,4)), is(false));
+    }
+
+    @Test
+    public void shouldReturnTrueIfPositionIsValidAndAtTheStart() {
+        assertThat(matrix.isValidPosition(new Position(0,0)), is(true));
+    }
+
+    @Test
+    public void shouldReturnTrueIfPositionIsValidAndAtTheEnd() {
+        assertThat(matrix.isValidPosition(new Position(3,3)), is(true));
+    }
+
+    @Test
+    public void shouldReturnTrueIfPositionIsValidAndAtTheEndOfTheFirstRow() {
+        assertThat(matrix.isValidPosition(new Position(0,3)), is(true));
+    }
+
+    @Test
+    public void shouldFindNextInRowFromStartPositionWhenPresent() {
+        assertThat(matrix.findNextInRowFromPosition('F',new Position(0,0)), is(new Position(0,0)));
+    }
+
+    @Test
+    public void shouldReturnNullWhenCharacterNotPresentInRow() {
+        assertThat(matrix.findNextInRowFromPosition('F',new Position(0,1)), nullValue());
+    }
+
+    @Test
+    public void shouldThrowExceptionWhenInvalidPositionIsPassed() {
+        Assertions.assertThrows(IllegalArgumentException.class,()->matrix.findNextInRowFromPosition('F',new Position(4,4)));
     }
 
     @Test
@@ -129,6 +181,26 @@ class MatrixTest {
     }
 
     @Test
+    public void shouldReturnTrueWhenNextPositionPresent() {
+        assertThat(matrix.hasNext(new Position(0,2)), is(true));
+    }
+
+    @Test
+    public void shouldReturnTrueWhenRowsFollowCurrentEndOfRow() {
+        assertThat(matrix.hasNext(new Position(0,3)), is(true));
+    }
+
+    @Test
+    public void shouldReturnFalseWhenAtTheEndOfMatrix() {
+        assertThat(matrix.hasNext(new Position(3,3)), is(false));
+    }
+
+    @Test
+    public void shouldThrowExceptionOnInvalidPositionWhenCheckingIfNextPositionPresent() {
+        Assertions.assertThrows(IllegalArgumentException.class, ()->matrix.hasNext(new Position(0,5)));
+    }
+
+    @Test
     public void shouldFetchNextPositionGivenAValidPosition() {
         assertThat(matrix.nextPosition(new Position(0,0)), Matchers.is(new Position(0,1)));
     }
@@ -139,8 +211,64 @@ class MatrixTest {
     }
 
     @Test
-    void shouldFindTargetWhenPresentInMatrix() {
+    public void shouldReturnTrueOnCompareOfIdenticalArrays() {
+        char[] source = {'F','O','A','M'};
         char[] target = {'F','O','A','M'};
+        assertThat(matrix.compare(source, target),is(true));
+    }
+
+    @Test
+    public void shouldReturnFalseOnCompareOfNonIdenticalArrays() {
+        char[] source = {'F','O','A'};
+        char[] target = {'F','O','A','M'};
+        assertThat(matrix.compare(source, target),is(false));
+    }
+
+    @Test
+    public void shouldFindSequenceWhenPresentVertically() {
+        char[] source = {'F','O','A','M'};
+        assertThat(matrix.isTargetSequence(source, new Position(0,0)), is(true));
+    }
+
+    @Test
+    public void shouldFindSequenceWhenPresentHorizontally() {
+        char[] source = {'F','A','C','I'};
+        assertThat(matrix.isTargetSequence(source, new Position(0,0)), is(true));
+    }
+
+    @Test
+    public void shouldFindSequenceWhenPresentVerticallyWhenTargetIsASubset() {
+        char[] source = {'O','A','M'};
+        assertThat(matrix.isTargetSequence(source, new Position(1,0)), is(true));
+    }
+
+    @Test
+    public void shouldFindSequenceWhenPresentHorizontallyWhenTargetIsASubset() {
+        char[] source = {'A','C','I'};
+        assertThat(matrix.isTargetSequence(source, new Position(0,1)), is(true));
+    }
+
+    @Test
+    public void shouldNotFindSequenceWhenPresentVertically() {
+        char[] source = {'R','O','A','M'};
+        assertThat(matrix.isTargetSequence(source, new Position(0,0)), is(false));
+    }
+
+    @Test
+    public void shouldNotFindSequenceWhenPresentHorizontally() {
+        char[] source = {'F','A','D','I'};
+        assertThat(matrix.isTargetSequence(source, new Position(0,0)), is(false));
+    }
+
+    @Test
+    void shouldFindTargetWhenPresentInMatrixVertically() {
+        char[] target = {'F','O','A','M'};
+        assertThat(matrix.findSequenceInMatrix(target), is(true));
+    }
+
+    @Test
+    void shouldFindTargetWhenPresentInMatrixHorizontally() {
+        char[] target = {'N', 'O', 'B'};
         assertThat(matrix.findSequenceInMatrix(target), is(true));
     }
 
@@ -153,7 +281,7 @@ class MatrixTest {
     @Test
     void shouldNotFindTargetWhenNotPresentInMatrix() {
         char[] target = {'F','O','B','M'};
-        assertThat(matrix.findSequenceInMatrix(target), is(true));
+        assertThat(matrix.findSequenceInMatrix(target), is(false));
     }
 
 }
